@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.StringUtil;
 
 import java.lang.reflect.Method;
@@ -42,13 +43,16 @@ public abstract class BaseCommand extends Command {
     protected String execLabel;
     protected String execSubcommand;
     protected String[] origArgs;
+    protected final Plugin plugin;
 
-    public BaseCommand() {
-        this(null);
+
+    public BaseCommand(Plugin plugin) {
+        this(null, plugin);
     }
 
-    public BaseCommand(String cmd) {
+    public BaseCommand(String cmd, Plugin plugin) {
         super(cmd);
+        this.plugin = plugin;
         final Class<? extends BaseCommand> self = this.getClass();
         CommandAlias rootCmdAlias = self.getAnnotation(CommandAlias.class);
         if (cmd == null) {
@@ -129,7 +133,7 @@ public abstract class BaseCommand extends Command {
     }
 
     private boolean register(String name, Command cmd) {
-        return Bukkit.getServer().getCommandMap().register(name.toLowerCase(), "empire", cmd);
+        return Bukkit.getServer().getCommandMap().register(name.toLowerCase(), plugin.getName().toLowerCase().trim(), cmd);
     }
 
     private void registerSubcommand(Method method, String subCommand) {
