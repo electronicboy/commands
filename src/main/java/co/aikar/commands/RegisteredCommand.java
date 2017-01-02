@@ -11,8 +11,10 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.Usage;
 import co.aikar.commands.annotation.Values;
 import co.aikar.commands.contexts.CommandContexts;
 import co.aikar.commands.contexts.CommandExecutionContext;
@@ -41,11 +43,14 @@ public class RegisteredCommand {
     public final Parameter[] parameters;
     public final ContextResolver<?>[] resolvers;
     public final String syntax;
+    public final String description;
+    public final String usage;
 
     public final CommandPermission perm;
     public final CommandCompletion complete;
     public final int nonSenderAwareResolvers;
     public final int optionalResolvers;
+
 
     RegisteredCommand(BaseCommand scope, String command, Method method, String prefSubCommand) {
         this.scope = scope;
@@ -60,6 +65,20 @@ public class RegisteredCommand {
         this.parameters = method.getParameters();
         this.resolvers = new ContextResolver[this.parameters.length];
         final Syntax syntaxStr = method.getAnnotation(Syntax.class);
+
+        final Description cmdDesc = method.getAnnotation(Description.class);
+        if (cmdDesc != null) {
+            description = cmdDesc.value();
+        } else {
+            description = scope.getName() + " " + command + " subcommand";
+        }
+
+        final Usage cmdUsage = method.getAnnotation(Usage.class);
+        if (cmdUsage != null) {
+            usage = cmdUsage.value();
+        } else {
+            usage = "/" + scope.getName() + " " + command;
+        }
 
         int nonSenderAwareResolvers = 0;
         int optionalResolvers = 0;

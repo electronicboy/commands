@@ -10,7 +10,9 @@ package co.aikar.commands;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Usage;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -59,8 +61,21 @@ public abstract class BaseCommand extends Command {
             setName(cmd);
             setLabel(cmd);
         }
-        this.description = cmd + " commands";
-        this.usageMessage = "/" + cmd;
+
+        final Description cmdDesc = self.getAnnotation(Description.class);
+        if (cmdDesc != null ) {
+            this.description = cmdDesc.value();
+        } else {
+            this.description = cmd + " commands";
+        }
+
+        final Usage cmdUsage = self.getAnnotation(Usage.class);
+
+        if (cmdUsage != null) {
+            this.usageMessage = cmdUsage.value();
+        } else {
+            this.usageMessage = "/" + cmd;
+        }
 
         final CommandPermission perm = self.getAnnotation(CommandPermission.class);
         if (perm != null) {
@@ -143,6 +158,8 @@ public abstract class BaseCommand extends Command {
                 register(name, new ForwardingCommand(this, subCommandParts));
             }
         }
+
+
     }
 
     /**
